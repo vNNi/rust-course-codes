@@ -2,6 +2,8 @@ use super::method::Method;
 use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
+use std::str;
+use std::str::Utf8Error;
 
 pub struct Request {
     path: String,
@@ -14,6 +16,7 @@ impl TryFrom<&[u8]> for Request {
 
     // GET /search/?name=abc&sort=1 HTTP/1.1
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        let request = str::from_utf8(value)?;
         unimplemented!()
     }
 }
@@ -47,5 +50,11 @@ impl ParseError {
             Self::InvalidProtocol => "Invalid Protocol",
             Self::InvalidEnconding => "Invalid Enconding",
         }
+    }
+}
+
+impl From<Utf8Error> for ParseError {
+    fn from(_: Utf8Error) -> Self {
+        Self::InvalidEnconding
     }
 }
